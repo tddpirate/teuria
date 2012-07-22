@@ -1,0 +1,77 @@
+<!--
+    Teuria - Practice for Israeli Driving Theory Test
+    Copyright (C) 2012  Omer Zak
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/
+
+    The author can be contacted via his Website at http://www.zak.co.il/
+-->
+<resources>
+
+    <string name="app_name">Teuria</string>
+    <string name="title_activity_main">Practice for Driving Theory Test</string>
+    <string name="init_db">Reactivate App</string>
+    <string name="menu_settings">Preferences</string>
+    <string name="check_updates">Check updates</string>
+    <string name="next_question">Next</string>
+    <string name="stats">Stats</string>
+    <string name="display_stats">Stats</string>
+    <string name="clear_stats">Clear stats</string>
+    <string name="xml_unchanged">Questions database was not changed</string>
+    <string name="xml_changed">Questions database was changed. To retrieve new version?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="xml_fetch_failure">Failed to retrieve questions file</string>
+    <string name="xml_badly_formatted">Questions file is corrupted</string>
+    <string name="xml_fetch_not_now">Update of questions file was cancelled at your request.  Do not forget to update later.</string>
+    <string name="langname_he_il">Hebrew</string>
+    <string name="langname_ar_aa">Arabic</string>
+    <string name="langname_ru_ru">Russian</string>
+    <!-- OZ: the following are used for internal testing.
+    <string name="download_url_he_il">http://zak.homedns.org/TheoryExamHE.zip</string>
+    <string name="download_url_ar_aa">http://zak.homedns.org/TheoryExamAR.zip</string>
+    <string name="download_url_ru_ru">http://zak.homedns.org/TheoryExamRU.zip</string>
+    -->
+    <string name="download_url_he_il">http://media.mot.gov.il/XML/TheoryExamHE.zip</string>
+    <string name="download_url_ar_aa">http://media.mot.gov.il/XML/TheoryExamAR.zip</string>
+    <string name="download_url_ru_ru">http://media.mot.gov.il/XML/TheoryExamRU.zip</string>
+    <string name="lang_he_il">he_IL</string>
+    <string name="lang_ar_aa">ar_AA</string>
+    <string name="lang_ru_ru">ru_RU</string>
+
+    <string-array name="langnames">
+        <item>Hebrew</item>
+        <item>Arabic</item>
+        <item>Russian</item>
+    </string-array>
+    <string-array name="langs">
+        <item>he_IL</item>
+        <item>ar_AA</item>
+        <item>ru_RU</item>
+    </string-array>
+
+    <string name="preferences">Preferences</string>
+    <string name="all_categories">All Categories</string>
+    <string name="exit">Exit</string>
+    <string name="show_question_activity_name">Question</string>
+    <string name="stats_title">Click on a button to start answering questions from that category.</string>
+    <string name="stats_format">%1$s (%4$d questions)\ncorrect %2$d    wrong %3$d</string>
+    <string name="start_questions">Start</string>
+    <string name="progress_bar_annotation">Loading questions database&#8230;</string>
+    <string name="title_activity_questions_loader">QuestionsLoader</string>
+    <string name="select_a_language">Select a language</string>
+    <string name="select_a_category">Select a category</string>
+    <string name="null_category_name">All</string>
+
+</resources>

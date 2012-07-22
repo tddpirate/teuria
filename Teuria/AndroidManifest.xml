@@ -1,0 +1,67 @@
+<!--
+    Teuria - Practice for Israeli Driving Theory Test
+    Copyright (C) 2012  Omer Zak
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/
+
+    The author can be contacted via his Website at http://www.zak.co.il/
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="il.co.zak.gplv3.hamakor.teuria"
+    android:versionCode="1"
+    android:versionName="0.1" >
+
+    <uses-sdk
+        android:maxSdkVersion="16"
+        android:minSdkVersion="8"
+        android:targetSdkVersion="8" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ShowQuestionActivity"
+            android:label="@string/show_question_activity_name"
+            android:stateNotNeeded="true"
+            android:theme="@style/ShowQuestionTheme" >
+        </activity>
+        <activity
+            android:name=".TeuriaPreferenceActivity"
+            android:label="@string/preferences"
+            android:launchMode="standard"
+            android:stateNotNeeded="true"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name=".QuestionsLoaderActivity"
+            android:label="@string/title_activity_questions_loader" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="il.co.zak.gplv3.hamakor.teuria.MainActivity" />
+        </activity>
+    </application>
+
+</manifest>

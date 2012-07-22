@@ -1,0 +1,61 @@
+<!--
+    Teuria - Practice for Israeli Driving Theory Test
+    Copyright (C) 2012  Omer Zak
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/
+
+    The author can be contacted via his Website at http://www.zak.co.il/
+-->
+<resources>
+
+    <string name="app_name">תיאוריה</string>
+    <string name="title_activity_main">תרגול למבחן תיאוריה לרשיון נהיגה</string>
+    <string name="init_db">איתחול האפליקציה</string>
+    <string name="menu_settings">הגדרות</string>
+    <string name="check_updates">בדיקת עדכונים</string>
+    <string name="next_question">השאלה הבאה</string>
+    <string name="stats">ציונים</string>
+    <string name="display_stats">ציונים</string>
+    <string name="clear_stats">נקה סטטיסטיקות</string>
+    <string name="xml_unchanged">לא היה עדכון למאגר השאלות</string>
+    <string name="xml_changed">יש עדכון למאגר השאלות. לאחזר את הגירסא החדשה?</string>
+    <string name="yes">כן</string>
+    <string name="no">לא</string>
+    <string name="xml_fetch_failure">כשלון באחזור מאגר השאלות</string>
+    <string name="xml_badly_formatted">קובץ מאגר השאלות משובש</string>
+    <string name="xml_fetch_not_now">עדכון מאגר השאלות בוטל לבקשתך.  לא לשכוח לעדכן יותר מאוחר.</string>
+    <string name="langname_he_il">עברית</string>
+    <string name="langname_ar_aa">ערבית</string>
+    <string name="langname_ru_ru">רוסית</string>
+
+    <string-array name="langnames">
+        <item>עברית</item>
+        <item>ערבית</item>
+        <item>רוסית</item>
+    </string-array>
+
+    <string name="preferences">הגדרות</string>
+    <string name="all_categories">כל הסוגים</string>
+    <string name="exit">יציאה</string>
+    <string name="show_question_activity_name">תצוגת שאלה</string>
+    <string name="stats_title">הקלק על אחת מהשורות כדי להתחיל לענות על שאלות מקטגוריה זו.</string>
+    <string name="stats_format">%1$s (%4$d שאלות)\nנכון %2$d   לא נכון %3$d</string>
+    <string name="start_questions">שאלה ראשונה</string>
+    <string name="progress_bar_annotation">מאגר השאלות בהטענה&#8230;</string>
+    <string name="title_activity_questions_loader">הטענת מאגר השאלות</string>
+    <string name="select_a_language">בחר שפה</string>
+    <string name="select_a_category">בחר קטגוריית שאלות</string>
+    <string name="null_category_name">הכל</string>
+
+</resources>

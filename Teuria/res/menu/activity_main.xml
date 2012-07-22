@@ -1,0 +1,28 @@
+<!--
+    Teuria - Practice for Israeli Driving Theory Test
+    Copyright (C) 2012  Omer Zak
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/
+
+    The author can be contacted via his Website at http://www.zak.co.il/
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/init_db" android:title="@string/init_db" android:orderInCategory="100"></item>
+    <item android:id="@+id/menu_settings"
+        android:title="@string/menu_settings"
+        android:orderInCategory="200" />
+    
+    <item android:id="@+id/check_updates" android:title="@string/check_updates" android:orderInCategory="300"></item>
+    <item android:id="@+id/clear_stats" android:title="@string/clear_stats" android:orderInCategory="600"/>
+</menu>

@@ -1,0 +1,6 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="android:Theme.Light" />
+    <style name="ShowQuestionTheme" android:layout_height="fill_parent" parent="android:Theme.Light" />
+
+</resources>
