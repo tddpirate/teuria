@@ -35,15 +35,6 @@
     <string name="xml_fetch_failure">כשלון באחזור מאגר השאלות</string>
     <string name="xml_badly_formatted">קובץ מאגר השאלות משובש</string>
     <string name="xml_fetch_not_now">עדכון מאגר השאלות בוטל לבקשתך.  לא לשכוח לעדכן יותר מאוחר.</string>
-    <string name="langname_he_il">עברית</string>
-    <string name="langname_ar_aa">ערבית</string>
-    <string name="langname_ru_ru">רוסית</string>
-
-    <string-array name="langnames">
-        <item>עברית</item>
-        <item>ערבית</item>
-        <item>רוסית</item>
-    </string-array>
 
     <string name="preferences">הגדרות</string>
     <string name="all_categories">כל הסוגים</string>
@@ -57,5 +48,6 @@
     <string name="select_a_language">בחר שפה</string>
     <string name="select_a_category">בחר קטגוריית שאלות</string>
     <string name="null_category_name">הכל</string>
-
+    <string name="select_liclevel">בחר סוג רשיון נהיגה</string>
+    
 </resources>

@@ -35,9 +35,6 @@
     <string name="xml_fetch_failure">Failed to retrieve questions file</string>
     <string name="xml_badly_formatted">Questions file is corrupted</string>
     <string name="xml_fetch_not_now">Update of questions file was cancelled at your request.  Do not forget to update later.</string>
-    <string name="langname_he_il">Hebrew</string>
-    <string name="langname_ar_aa">Arabic</string>
-    <string name="langname_ru_ru">Russian</string>
     <!-- OZ: the following are used for internal testing.
     <string name="download_url_he_il">http://zak.homedns.org/TheoryExamHE.zip</string>
     <string name="download_url_ar_aa">http://zak.homedns.org/TheoryExamAR.zip</string>
@@ -46,21 +43,27 @@
     <string name="download_url_he_il">http://media.mot.gov.il/XML/TheoryExamHE.zip</string>
     <string name="download_url_ar_aa">http://media.mot.gov.il/XML/TheoryExamAR.zip</string>
     <string name="download_url_ru_ru">http://media.mot.gov.il/XML/TheoryExamRU.zip</string>
+
     <string name="lang_he_il">he_IL</string>
     <string name="lang_ar_aa">ar_AA</string>
     <string name="lang_ru_ru">ru_RU</string>
 
     <string-array name="langnames">
-        <item>Hebrew</item>
-        <item>Arabic</item>
-        <item>Russian</item>
+        <item>עברית</item>
+        <item>العربية</item>
+        <item>русский</item>
     </string-array>
     <string-array name="langs">
         <item>he_IL</item>
         <item>ar_AA</item>
         <item>ru_RU</item>
     </string-array>
-
+    <string-array name="lang_directionality">
+        <item>rtl</item>
+        <item>rtl</item>
+        <item>ltr</item>
+    </string-array>
+    
     <string name="preferences">Preferences</string>
     <string name="all_categories">All Categories</string>
     <string name="exit">Exit</string>
@@ -73,5 +76,6 @@
     <string name="select_a_language">Select a language</string>
     <string name="select_a_category">Select a category</string>
     <string name="null_category_name">All</string>
+    <string name="select_liclevel">Select a license type</string>
 
 </resources>

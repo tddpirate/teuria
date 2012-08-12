@@ -37,6 +37,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
 import android.util.Xml;
 
 /**
@@ -45,7 +46,7 @@ import android.util.Xml;
  */
 
 public final class QuestionsFetcher {
-	//private static final String TAG = "QuestionsFetcher";
+	private static final String TAG = "QuestionsFetcher";
 
 	/**
 	 * Listener for questions as they are retrieved from the file, one by one.
@@ -58,6 +59,14 @@ public final class QuestionsFetcher {
 		 * @param question - the Question class instance to be saved.
 		 */
 		public void listenNewQuestion(Question question);
+		
+		/**
+		 * Called whenever a license level string is available (such as for saving
+		 * to the database).  The license level is associated with the most recently
+		 * provided question (last listenNewQuestion() call).
+		 * @param licenseLevel - another license level for the question.
+		 */
+		public void listenLicenseLevel(String licenseLevel);
 		
 		/**
 		 * Called to indicate that all questions have been processed.
@@ -77,7 +86,7 @@ public final class QuestionsFetcher {
 			throw new RuntimeException("Bad URL: " + urlstring);
 		}
 		InputStream in = urlConnection.getInputStream();
-		ZipInputStream zipin = new ZipInputStream(new BufferedInputStream(in));
+		ZipInputStream zipin = new ZipInputStream(new BufferedInputStream(in,32768));
 		ZipEntry ze = zipin.getNextEntry();  // We expect to see exactly one entry.
 		if (null == ze) {
 			throw new RuntimeException("No ZIP archive in URL: " + urlstring);
@@ -113,9 +122,9 @@ public final class QuestionsFetcher {
 	
 	private static class QuestionsContentHandler extends DefaultHandler {
 		private QuestionListener mListener;
-		private StringBuilder text;
+		private StringBuilder mText = new StringBuilder(4096);
 		private String mCurrentTag = new String();
-		private Question mCurrentQuestion;
+		private Question mCurrentQuestion = new Question();
 		
 		public QuestionsContentHandler(QuestionListener listener) {
 			super();
@@ -125,9 +134,7 @@ public final class QuestionsFetcher {
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			super.characters(ch, start, length);
-			if (text != null) {
-				text.append(ch, start, length);
-			}
+			mText.append(ch, start, length);
 		}
 
 		/* (non-Javadoc)
@@ -138,7 +145,7 @@ public final class QuestionsFetcher {
 		public void ignorableWhitespace(char[] ch, int start, int length)
 				throws SAXException {
 			super.ignorableWhitespace(ch, start, length);
-			text.append(ch, start, length);
+			mText.append(ch, start, length);
 		}
 		 */
 		
@@ -159,46 +166,51 @@ public final class QuestionsFetcher {
 				throws SAXException {
 
 			if (localName == "item") {
-				if ((text != null) && (text.toString() != "")) {
+				if (mText.length() > 0) {
 					throw new SAXException("Text found outside of item's subordinate tags");
 				}
 				mListener.listenNewQuestion(mCurrentQuestion);
-				mCurrentQuestion = null;
+				QuestionDescriptionTransform.TransformAuxiliaryFunctions.extractLicenseLevels(mCurrentQuestion.getDescription(),new QuestionDescriptionTransform.ReceiveStrings() {
+					public void receiveString(String string) {
+						mListener.listenLicenseLevel(string);
+					}
+				});
+				mCurrentQuestion.clear();
 			}
-			else if (mCurrentQuestion != null) {
+			else if (!mCurrentQuestion.isClear()) {
 				// Recognize the other tags only inside an item.
 				if (mCurrentTag != localName) {
 					throw new SAXException("Bad tag end - should be " + mCurrentTag + ", is " + localName + " instead");
 				}
 
 				if (localName == "title") {
-					mCurrentQuestion.setTitle(text.toString());
+					mCurrentQuestion.setTitle(mText.toString());
 				}
 				else if (localName == "link") {
-					mCurrentQuestion.setLink(text.toString());
+					mCurrentQuestion.setLink(mText.toString());
 				}
 				else if (localName == "guid") {
-					mCurrentQuestion.setGuid(text.toString());
+					mCurrentQuestion.setGuid(mText.toString());
 				}
 				else if (localName == "description") {
-					mCurrentQuestion.setDescription(text.toString());
+					mCurrentQuestion.setDescription(mText.toString());
 				}
 				else if (localName == "author") {
-					mCurrentQuestion.setAuthor(text.toString());
+					mCurrentQuestion.setAuthor(mText.toString());
 				}
 				else if (localName == "category") {
-					mCurrentQuestion.setCategory(text.toString());
+					mCurrentQuestion.setCategory(mText.toString());
 				}
 				else if (localName == "pubDate") {
 					try {
-						mCurrentQuestion.setPubDate(text.toString());
+						mCurrentQuestion.setPubDate(mText.toString());
 					}
 					catch (ParseException e) {
-						throw new SAXException("parse exception for " + text.toString());
+						throw new SAXException("parse exception for " + mText.toString());
 					}
 				}
-				text = null;
 			}
+			mText.delete(0, mText.length());
 			super.endElement(uri, localName, qName);
 		}
 
@@ -212,17 +224,17 @@ public final class QuestionsFetcher {
 			// TODO Auto-generated method stub
 			super.startElement(uri, localName, qName, attributes);
 
-			if (text != null) {
-				throw new SAXException("Text outside of tags: '" + text + "'");
+			if (mText.length() > 0) {
+				throw new SAXException("Text outside of tags: '" + mText + "'");
 			}
 			
 			if (localName == "item") {
-				if (mCurrentQuestion != null) {
+				if (!mCurrentQuestion.isClear()) {
 					throw new SAXException("item inside item");
 				}
-				mCurrentQuestion = new Question();
+				mCurrentQuestion.setTitle(""); // Just to mark the question as !isClear().
 			}
-			else if (mCurrentQuestion != null) {
+			else if (!mCurrentQuestion.isClear()) {
 				// Recognize the other tags only inside an item.
 				
 				if ((localName == "title")
@@ -233,7 +245,7 @@ public final class QuestionsFetcher {
 						|| (localName == "category")
 						|| (localName == "pubDate")) {
 					mCurrentTag = localName;
-					text = new StringBuilder();
+					mText.delete(0,mText.length());
 				}
 			}
 		}
@@ -264,6 +276,13 @@ public final class QuestionsFetcher {
 	 */
 	public static void fetchQuestionsDatabase(String urlstring, QuestionListener listener, XmlParsingProgress progressbar)
 			throws MalformedURLException,IOException,SAXException {
-		processZippedXmlFile(retrieveZippedXmlFile(urlstring), listener, progressbar);
+		long startReadingTimeStamp = System.currentTimeMillis();
+		String xmlstuff = retrieveZippedXmlFile(urlstring);
+		long startParsingTimeStamp = System.currentTimeMillis();
+		processZippedXmlFile(xmlstuff, listener, progressbar);
+		long endParsingTimeStamp = System.currentTimeMillis();
+
+		Log.d(TAG, "Retrieve and unzip XML file: " + (startParsingTimeStamp - startReadingTimeStamp) + "mSec");
+		Log.d(TAG, "Parse XML file and load into DB: " + (endParsingTimeStamp - startParsingTimeStamp) + "mSec");
 	}
 }

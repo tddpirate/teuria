@@ -45,8 +45,10 @@ public class Question {
 	
 	private int mId;
 	
+	private boolean mIsClear = false;
+	
 	public Question() {
-		mId = -1;  // No ID initially assigned.
+		clear();
 	}
 
 	/**
@@ -61,6 +63,7 @@ public class Question {
 	 */
 	public Question setTitle(String mTitle) {
 		this.mTitle = mTitle;
+		mIsClear = false;
 		return this;
 	}
 
@@ -76,6 +79,7 @@ public class Question {
 	 */
 	public Question setLink(String mLink) {
 		this.mLink = mLink;
+		mIsClear = false;
 		return this;
 	}
 
@@ -91,6 +95,7 @@ public class Question {
 	 */
 	public Question setGuid(String mGuid) {
 		this.mGuid = mGuid;
+		mIsClear = false;
 		return this;
 	}
 
@@ -106,6 +111,7 @@ public class Question {
 	 */
 	public Question setDescription(String mDescription) {
 		this.mDescription = mDescription;
+		mIsClear = false;
 		return this;
 	}
 
@@ -121,6 +127,7 @@ public class Question {
 	 */
 	public Question setAuthor(String mAuthor) {
 		this.mAuthor = mAuthor;
+		mIsClear = false;
 		return this;
 	}
 
@@ -136,6 +143,7 @@ public class Question {
 	 */
 	public Question setCategory(String mCategory) {
 		this.mCategory = mCategory;
+		mIsClear = false;
 		return this;
 	}
 
@@ -151,6 +159,7 @@ public class Question {
 	 */
 	public Question setPubDate(Date mPubDate) {
 		this.mPubDate = mPubDate;
+		mIsClear = false;
 		return this;
 	}
 
@@ -161,6 +170,7 @@ public class Question {
 	 */
 	public Question setPubDate(String dateString) throws ParseException {
 		this.mPubDate = DATE_FORMAT.parse(dateString);
+		mIsClear = false;
 		return this;
 	}
 	
@@ -170,12 +180,36 @@ public class Question {
 	
 	public Question setID(int id) {
 		mId = id;
+		mIsClear = false;
 		return this;
+	}
+	
+	/**
+	 * Clear the current Question instance.
+	 * @return this instance.
+	 */
+	public Question clear() {
+		mTitle = null;
+		mLink = null;
+		mGuid = null;
+		mDescription = null;
+		mAuthor = null;
+		mCategory = null;
+		mPubDate = null;
+		mId = -1;  // No ID initially assigned.
+		mIsClear = true;
+		return this;
+	}
+
+	public boolean isClear() {
+		return mIsClear;
 	}
 	
 	@Override
 	public String toString() {
-		return("Question " + mId + ":"
+		return mIsClear
+				? "Cleared"
+				: ("Question " + mId + ":"
 				+ ((mTitle != null) && (mTitle.length() > 0) ? " Title:" + mTitle : "")
 				+ ((mLink != null) && (mLink.length() > 0) ? " Link:" + mLink : "")
 				+ ((mGuid != null) && (mGuid.length() > 0) ? " Guid:" + mGuid : "")

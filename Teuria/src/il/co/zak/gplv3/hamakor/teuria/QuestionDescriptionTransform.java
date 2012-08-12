@@ -27,6 +27,8 @@ package il.co.zak.gplv3.hamakor.teuria;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,6 +44,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -81,8 +84,28 @@ public final class QuestionDescriptionTransform {
 			+ "}"
 			+ "</script>";
 
+	private static final Pattern SPLITTER_PATTERN = Pattern.compile("\\|");
+	//private static final Pattern LICENSE_LEVEL_PATTERN = Pattern.compile("^\\s*\\u00AB([a-zA-Z0-9]+)\\u00BB\\s*$");
+	private static final Pattern LICENSE_LEVEL_PATTERN = Pattern.compile("^\\s*\\u00AB(\\p{Alnum}+)\\u00BB\\s*$");
+	// The simple [a-zA-Z0-9]+ pattern failed because the license level 'B' is actually
+	// Cyrillic B.
 
-	final static private class TransformAuxiliaryFunctions {
+	/**
+	 * Interface to be used to pass strings from a string array, when
+	 * the client prefers to access them one by one.
+	 * @author omer
+	 *
+	 */
+	public interface ReceiveStrings {
+		public void receiveString(String string);
+	}
+
+	final static public class TransformAuxiliaryFunctions {
+		/**
+		 * Exports xml string from the DOM data structure
+		 * @param doc - DOM data structure representing the document
+		 * @return String containing the corresponding xml. 
+		 */
 		static public String getStringFromDoc(Document doc)    {
 			// Source: http://stackoverflow.com/questions/315517/is-there-a-more-elegant-way-to-convert-an-xml-document-to-a-string-in-java-than
 			try {
@@ -100,6 +123,42 @@ public final class QuestionDescriptionTransform {
 				ex.printStackTrace();
 				return null;
 			}			
+		}
+		
+		/**
+		 * Extract an array of license levels from the given string.
+		 * @param text
+		 * @param receiver if not null, then receiver.receiveString() is called
+		 * for each license level string.
+		 * @return false if the input text is not a valid license levels string.
+		 * The input text is not valid if a license level string is not recognized
+		 * in any post-split segment except for the first and last ones.
+		 */
+		static public boolean extractLicenseLevels(String text, ReceiveStrings receiver) {
+			String[] splitted = SPLITTER_PATTERN.split(text);
+			int ind = 0;
+			//Log.d(TAG,"The string was split into " + splitted.length + " fragments");
+			for (String frag: splitted) {
+				Matcher match = LICENSE_LEVEL_PATTERN.matcher(frag);
+				if (match.matches()) {
+					//Log.d(TAG,"Recognized license level >" + match.group(1) + "<");
+					if (receiver != null) {
+						receiver.receiveString(match.group(1));
+					}
+				}
+				else {
+					if ((ind > 0) && (ind < splitted.length - 1)) {
+						//Log.d(TAG,"Fragment " + ind + " >" + frag + "< failed to match - returning false");
+						//for (int jnd = 0; jnd < frag.length(); ++jnd) {
+						//	Log.d(TAG,"character " + jnd + " is " + frag.codePointAt(jnd) + ", " + frag.charAt(jnd) + ".");
+						//}
+						return false;
+					}
+					//Log.d(TAG,"Excusing fragment " + ind + " >" + frag + "< from matching a license level pattern");
+				}
+				++ind;
+			}
+			return true;
 		}
 	}
 
@@ -125,8 +184,9 @@ public final class QuestionDescriptionTransform {
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory
 					.newInstance().newDocumentBuilder();
-			//Document doc = builder.parse(new StringBufferInputStream(description));
 			Document doc = builder.parse(new InputSource(new StringReader(description)));
+			
+			// Transform the <li> elements to invoke our JavaScript code.
 			NodeList liis = doc.getElementsByTagName("li");
 			for (int ind = 0; ind < liis.getLength(); ++ind) {
 				Element liElement = (Element) liis.item(ind);
@@ -153,11 +213,22 @@ public final class QuestionDescriptionTransform {
 					}
 				}
 			}
+			
+			// Eliminate the button for revealing the correct answer.
 			NodeList buttons = doc.getElementsByTagName("button");
 			if (buttons.getLength() == 1) {
 				// We deal with the button only if there is exactly one original button.
 				Node parent = buttons.item(0).getParentNode();
 				parent.removeChild(buttons.item(0));
+			}
+			
+			// Eliminate the string with license levels.  It is the last <span> in
+			// the question description.
+			NodeList spans = doc.getElementsByTagName("span");
+			String text = ((Text) spans.item(spans.getLength()-1).getFirstChild()).getWholeText();
+			if (TransformAuxiliaryFunctions.extractLicenseLevels(text,null)) {
+				Node spanparent = spans.item(spans.getLength()-1).getParentNode();
+				spanparent.removeChild(spans.item(spans.getLength()-1));
 			}
 			
 			description = TransformAuxiliaryFunctions.getStringFromDoc(doc);

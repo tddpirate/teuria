@@ -23,10 +23,10 @@ package il.co.zak.gplv3.hamakor.teuria;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.ScrollView;
 
 /**
  * @author omer
@@ -83,6 +83,7 @@ public class ShowQuestionActivity extends Activity {
 			Log.d(TAG, "JavaScript returned: " + resStatus);
 			mContext.mAnswer =  resStatus ? ShowQuestionResultCode.ANSWER_CORRECT
 					: ShowQuestionResultCode.ANSWER_WRONG;
+			/*
 			// We also want to scroll down once the user has chosen an answer.
 			final ScrollView scrollView = (ScrollView) mContext.findViewById(R.id.scrollview);
 			scrollView.post(new Runnable() {
@@ -90,6 +91,13 @@ public class ShowQuestionActivity extends Activity {
 					scrollView.smoothScrollBy(0,200);   // !!! Need a way to compute height, instead of guessing.
 				}
 			});
+			*/
+			// TODO !!! Do the following only in Study Mode.
+			Vibrator vibrator = (Vibrator) mContext.getSystemService(VIBRATOR_SERVICE);
+			if (!resStatus /* && vibrator.hasVibrator()*/ ) {
+				// hasVibrator() exists only for API level >= 11
+				vibrator.vibrate(200);
+			}
 		}
 	}
     
@@ -107,6 +115,7 @@ public class ShowQuestionActivity extends Activity {
 		String content = extras.getString("Content");
 		String category = extras.getString("Category");
 		mQuestionId = extras.getInt("questionid");
+		String langDirectionality = extras.getString("LangDirectionality");
 
 		mAnswer = ShowQuestionResultCode.ANSWER_SKIP;
 		
@@ -115,7 +124,8 @@ public class ShowQuestionActivity extends Activity {
         WebView wv = (WebView) findViewById(R.id.webview);
         wv.getSettings().setJavaScriptEnabled(true);
         wv.addJavascriptInterface(new JavaScriptInterface(this), "androidresult");
-        content = "<html><style type='text/css'>.text-highlight { background: #FFFFAA }</style><body><div dir='rtl'>" + title + "</div><div>" + content + "</div></body></html>";
+        Log.d(TAG,"langDirectionality = " + langDirectionality);
+        content = "<html><style type='text/css'>.text-highlight { background: #FFFFAA }</style><body><div dir='" + langDirectionality + "'>" + title + "</div><div>" + content + "</div></body></html>";
         //wv.loadData(content, mimeType, null);
         wv.loadDataWithBaseURL("http://tqpic.mot.gov.il/", content, mimeType, "utf-8", null);
 	}
@@ -140,10 +150,14 @@ public class ShowQuestionActivity extends Activity {
     	super.finish();
     	
     }
+
+    /*
     public void onClickExit(View view) {
     	Log.d(TAG,"onClickExit was invoked");
     	finish();
     }
+    */
+
     @Override
     public void finish() {
     	Log.d(TAG,"finish() was invoked");

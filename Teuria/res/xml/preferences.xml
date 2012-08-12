@@ -18,12 +18,9 @@
     The author can be contacted via his Website at http://www.zak.co.il/
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <EditTextPreference android:key="CurrentUser" android:defaultValue="Me" android:enabled="false" android:title="Current User"/>
     <PreferenceCategory android:title="Download URLs (Advanced)" android:orderingFromXml="true">
         <EditTextPreference android:key="DownloadURL.he_IL" android:title="Hebrew" android:defaultValue="@string/download_url_he_il"/>
         <EditTextPreference android:key="DownloadURL.ar_AA" android:defaultValue="@string/download_url_ar_aa" android:title="Arabic"/>
         <EditTextPreference android:key="DownloadURL.ru_RU" android:defaultValue="@string/download_url_ru_ru" android:title="Russian"/>
     </PreferenceCategory>
-    
-
 </PreferenceScreen>

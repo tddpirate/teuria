@@ -44,10 +44,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:fadeScrollbars="false"
+        android:scrollbarStyle="outsideInset"
         android:scrollbars="vertical" >
     </ListView>
     </LinearLayout>
 
+	<!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +64,8 @@
             android:layout_gravity="center"
             android:onClick="onClickExit"
             android:text="@string/exit" />
-        
+
     </LinearLayout>
+    -->
 
 </LinearLayout>

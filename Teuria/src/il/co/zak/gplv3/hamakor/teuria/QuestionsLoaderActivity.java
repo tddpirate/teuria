@@ -64,27 +64,34 @@ public class QuestionsLoaderActivity extends Activity {
 		final String fDownloadURL = extras.getString("DownloadURL");
 		final String fLanguage = extras.getString("Language");
 		final long fDate = extras.getLong("Date");
-        final TeuriaDatabase fDB = new TeuriaDatabase(this);
+
+		SharedPreferences preferences2 = PreferenceManager.getDefaultSharedPreferences(QuestionsLoaderActivity.this);
+		String licLevel = preferences2.getString("License", "(invalid)");
+        final TeuriaDatabase fDB = new TeuriaDatabase(this,licLevel);
 
 		QuestionsLoaderActivity.this.requestWindowFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_questions_loader);
         //getActionBar().setDisplayHomeAsUpEnabled(true); // Belongs to API level 11
         QuestionsLoaderActivity.this.getWindow().setFeatureInt( Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
         
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(QuestionsLoaderActivity.this);
-        final String fCurrentUser = preferences.getString("CurrentUser", "Me");
 		new Thread(new Runnable() {
 			public void run() {
 				try {
+					fDB.prepareForAddQuestions();
 					//QuestionsLoaderActivity.this.requestWindowFeature(Window.FEATURE_PROGRESS);
 					QuestionsFetcher.fetchQuestionsDatabase(fDownloadURL,
 							new QuestionsFetcher.QuestionListener() {
+						int mQid;
 						public void listenNewQuestion(Question question) {
-							question.setDescription(QuestionDescriptionTransform.transform(question.getDescription()));
-							int qid = fDB.addQuestion(question);
-							fDB.initAnswerRecord(fCurrentUser, qid);
+							//question.setDescription(QuestionDescriptionTransform.transform(question.getDescription()));
+							mQid = fDB.addQuestionFast(question);
+							fDB.initAnswerRecordFast(mQid);
+						}
+						public void listenLicenseLevel(String licenseLevel) {
+							fDB.addLicenseLevelRecordFast(mQid, licenseLevel);
 						}
 						public void endOfQuestions() {
+							fDB.finishAddQuestions();
 							QuestionsLoaderActivity.this.runOnUiThread(new Runnable() {
 								public void run() {
 									QuestionsLoaderActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, 10000);

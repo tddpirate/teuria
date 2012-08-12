@@ -56,15 +56,15 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        mDB = new TeuriaDatabase(this);
-        
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+		String licLevel = preferences.getString("License", "(invalid)");
+        mDB = new TeuriaDatabase(this, licLevel);
+
         // GUI work
         setContentView(R.layout.activity_main);
 
         CategoryStats.setToStringFormat(getString(R.string.stats_format));
         CategoryStats.setNullCategoryName(getString(R.string.null_category_name));
-        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-    	//CategoryStats[] stats = mDB.getCategoryStatistics(preferences.getString("CurrentUser", "Me"));
 		mStatsAdapter = new ArrayAdapter<CategoryStats>(this, R.layout.display_stat_as_button, R.id.button1) {
 			@Override
 	        public View getView(int position, View convertView, ViewGroup parent) {
@@ -110,12 +110,14 @@ public class MainActivity extends Activity {
 						}
 						String[] languages = MainActivity.this.getResources().getStringArray(R.array.langs);
 						// The chosen language is languages[id]
+						String[] langDirectionalities = MainActivity.this.getResources().getStringArray(R.array.lang_directionality);
 						SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 						SharedPreferences.Editor editor = preferences.edit();
 						editor.putString("Language", languages[id]);
+						editor.putString("LangDirectionality", langDirectionalities[id]);
 						editor.commit();
-						
-						// DB loading - category will be selected in onActivityResult().
+
+						// DB loading - license level will be selected in onActivityResult().
 						Intent questionsLoaderActivity = new Intent(getBaseContext(), QuestionsLoaderActivity.class);
 						questionsLoaderActivity.putExtra("DownloadURL", preferences.getString("DownloadURL." + languages[id], getString(R.string.download_url_he_il)))
 											.putExtra("Language", languages[id])
@@ -218,7 +220,6 @@ public class MainActivity extends Activity {
 			// A different language was chosen.
 			// For now, we deal with this by reinitializing the DB.
 			initDb();
-			// !!! Currently, the user cannot change the currentUser setting.
 		}
 		return true;
 	}
@@ -289,13 +290,16 @@ public class MainActivity extends Activity {
 			// In the preferences dialog, cannot have null as one of the choices.
 			category = null;
 		}
-		Question question = mDB.getRandomQuestion(preferences.getString("CurrentUser", "Me"),
-												category);
+		String langDirectionality = preferences.getString("LangDirectionality", "rtl");
+		Question question = mDB.getRandomQuestion(category);
+		question.setDescription(QuestionDescriptionTransform.transform(question.getDescription()));
+
 		Intent showQuestionActivity = new Intent(getBaseContext(), ShowQuestionActivity.class);
 		showQuestionActivity.putExtra("Title", question.getTitle())
 							.putExtra("Content", question.getDescription())
 							.putExtra("Category", question.getCategory())
 							.putExtra("questionid", question.getID());
+		showQuestionActivity.putExtra("LangDirectionality", langDirectionality);
 		startActivityForResult(showQuestionActivity,SHOW_QUESTION_REQUEST_CODE);
 
 		return true;
@@ -309,9 +313,7 @@ public class MainActivity extends Activity {
 						+ ", answer=" + data.getExtras().getInt("answer")
 						+ ", nextstep=" + ShowQuestionActivity.ShowQuestionNextStep.values()[data.getExtras().getInt("nextstep")]
 						);
-				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-				mDB.modifyAnswer(preferences.getString("CurrentUser", "Me"),
-						data.getExtras().getInt("questionid"),
+				mDB.modifyAnswer(data.getExtras().getInt("questionid"),
 						data.getExtras().getInt("answer"));
 				switch (ShowQuestionActivity.ShowQuestionNextStep.values()[data.getExtras().getInt("nextstep")]) {
 				case NEXTSTEP_QUESTION: // Display another question
@@ -341,40 +343,33 @@ public class MainActivity extends Activity {
 		}
 		else if (resultCode == RESULT_OK && requestCode == INITIAL_ACTIVATION_QUESTIONS_LOADER_REQUEST_CODE) {
 			Log.d(TAG, "Finished loading the questions database during initial activation");
-			displayStats();
-			Log.d(TAG,"Now ready to work");
 
-/*			
-			// Third and final step of first activation - select a category.
+			// Third and final step of first activation - select a license level.
 
-			String[] categories = mDB.getAllCategories();
-			String[] categoriesWithAll = new String[categories.length + 1];
-			System.arraycopy(categories, 0,
-					categoriesWithAll, 1, categories.length);
-	        categoriesWithAll[0] = getString(R.string.all_categories);
-	        final String[] fCategoriesWithAll = categoriesWithAll;
+			String[] liclevels = mDB.getAllLiclevels();
+	        final String[] fLiclevels = liclevels;
+	        final TeuriaDatabase fDB = mDB;
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.select_a_category)
+			builder.setTitle(R.string.select_liclevel)
 					.setCancelable(false)
-					.setSingleChoiceItems(fCategoriesWithAll, 0, new DialogInterface.OnClickListener() {
+					.setSingleChoiceItems(fLiclevels, fLiclevels.length - 1, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							Log.d(TAG,"Category " + id + "th was chosen");
+							Log.d(TAG,"License level " + id + "th was chosen");
 							dialog.dismiss();
-
-							String category = (id == 0) ? "" : fCategoriesWithAll[id];
 
 							SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 							SharedPreferences.Editor editor = preferences.edit();
-							editor.putString("Category", category);
+							editor.putString("License", fLiclevels[id]);
 							editor.commit();
-							
+							// Now update the licensing level in mDB.
+							fDB.setQuestionsFilteringLiclevel(fLiclevels[id]);
+
 							displayStats();
 							Log.d(TAG,"Now ready to work");
 						}
 					});
 			AlertDialog alert = builder.create();
 			alert.show();
-*/
 		}
 	} 
 	
@@ -387,8 +382,7 @@ public class MainActivity extends Activity {
 	 */
 	private int displayStats() {
 		// Update the stats.
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-		CategoryStats[] stats = mDB.getCategoryStatistics(preferences.getString("CurrentUser", "Me"));
+		CategoryStats[] stats = mDB.getCategoryStatistics();
 		for (CategoryStats stat: stats) {
 			Log.d(TAG,stat.toString());
 		}
@@ -437,8 +431,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private boolean clearStats() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-		mDB.clearStatistics(preferences.getString("CurrentUser", "Me"));
+		mDB.clearStatistics();
 		displayStats();
 		return true;
 	}
@@ -457,7 +450,9 @@ public class MainActivity extends Activity {
 		nextQuestion();
 	}
 
+	/*
 	public void onClickExit(View view) {
 		finish();
 	}
+	*/
 }
