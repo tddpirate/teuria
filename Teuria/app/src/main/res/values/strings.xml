@@ -40,9 +40,9 @@
     <string name="download_url_ar_aa">http://zak.homedns.org/TheoryExamAR.zip</string>
     <string name="download_url_ru_ru">http://zak.homedns.org/TheoryExamRU.zip</string>
     -->
-    <string name="download_url_he_il">http://media.mot.gov.il/XML/TheoryExamHE.zip</string>
-    <string name="download_url_ar_aa">http://media.mot.gov.il/XML/TheoryExamAR.zip</string>
-    <string name="download_url_ru_ru">http://media.mot.gov.il/XML/TheoryExamRU.zip</string>
+    <string name="download_url_he_il">http://media.mot.gov.il/XML/TheoryExamHE.xml</string>
+    <string name="download_url_ar_aa">http://media.mot.gov.il/XML/TheoryExamAR.xml</string>
+    <string name="download_url_ru_ru">http://media.mot.gov.il/XML/TheoryExamRU.xml</string>
 
     <string name="lang_he_il">he_IL</string>
     <string name="lang_ar_aa">ar_AA</string>

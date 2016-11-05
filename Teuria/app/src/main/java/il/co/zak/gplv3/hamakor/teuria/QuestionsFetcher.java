@@ -83,7 +83,7 @@ public final class QuestionsFetcher {
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 		int responseCode = urlConnection.getResponseCode();
 		if (200 != responseCode) {
-			throw new RuntimeException("Bad URL: " + urlstring);
+			throw new RuntimeException("Bad URL: " + urlstring + "(Response code: " + responseCode + ")");
 		}
 		InputStream in = urlConnection.getInputStream();
 		ZipInputStream zipin = new ZipInputStream(new BufferedInputStream(in,32768));
@@ -119,7 +119,40 @@ public final class QuestionsFetcher {
 		
 		return xmlstuff;
 	}
-	
+
+    /**
+     *
+     * @param urlstring - from which the xml file containing the questions is to be retrieved
+     */
+    private static String retrieveXmlFile(String urlstring) throws MalformedURLException,IOException {
+        URL url = new URL(urlstring);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        int responseCode = urlConnection.getResponseCode();
+        if (200 != responseCode) {
+            throw new RuntimeException("Bad URL: " + urlstring + "(Response code: " + responseCode + ")");
+        }
+        long contentLength = Long.parseLong(urlConnection.getHeaderField("Content-Length"));
+        if (contentLength < 1) {
+            throw new RuntimeException("Bad content length for URL: " + urlstring);
+        }
+        InputStream in = urlConnection.getInputStream();
+        BufferedInputStream bufin = new BufferedInputStream(in,32768);
+
+        byte[] xmlbytes = new byte[(int) contentLength];
+        int read_offset = 0;
+        while (read_offset < xmlbytes.length) {
+            int read_bytes = bufin.read(xmlbytes, read_offset, xmlbytes.length - read_offset);
+            if (read_bytes == 0) {
+                throw new RuntimeException("Internal read error");
+            }
+            read_offset += read_bytes;
+        }
+        String xmlstuff = new String(xmlbytes,"UTF-8");
+        bufin.close();
+
+        return xmlstuff;
+    }
+
 	private static class QuestionsContentHandler extends DefaultHandler {
 		private QuestionListener mListener;
 		private StringBuilder mText = new StringBuilder(4096);
@@ -277,7 +310,7 @@ public final class QuestionsFetcher {
 	public static void fetchQuestionsDatabase(String urlstring, QuestionListener listener, XmlParsingProgress progressbar)
 			throws MalformedURLException,IOException,SAXException {
 		long startReadingTimeStamp = System.currentTimeMillis();
-		String xmlstuff = retrieveZippedXmlFile(urlstring);
+		String xmlstuff = (urlstring.substring(urlstring.length() - 4).contentEquals(".zip")) ? retrieveZippedXmlFile(urlstring) : retrieveXmlFile(urlstring);
 		long startParsingTimeStamp = System.currentTimeMillis();
 		processZippedXmlFile(xmlstuff, listener, progressbar);
 		long endParsingTimeStamp = System.currentTimeMillis();
