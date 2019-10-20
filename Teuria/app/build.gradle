@@ -5,7 +5,7 @@ android {
     }
 
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    //buildToolsVersion "23.0.3"
 
     defaultConfig {
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
@@ -19,10 +19,25 @@ android {
     }
 
     applicationVariants.all { variant ->
+        variant.outputs.all {
+            // APK file rename
+            outputFileName = "Teuria-${variant.versionName}-${variant.versionCode}-${variant.name}.apk"
+        }
         variant.outputs.each { output ->
-            output.outputFile = new File(
-                    output.outputFile.parent,
-                    output.outputFile.name.replace("app-", "Teuria-${variant.versionName}-${variant.versionCode}-"))
+            if (variant.getBuildType().isMinifyEnabled()) {
+                variant.assembleProvider.configure {
+                    it.doLast {
+                        // Mapping file rename
+                        String mappingFileName = output.outputFile.name.replace("app-", "Teuria-${variant.versionName}-${variant.versionCode}-").replace(".apk", "--mapping.txt")
+                        println "${variant.name}: mappingFileName = $mappingFileName"
+                        copy {
+                            from variant.mappingFile
+                            into "${output.outputFile.parent}"
+                            rename { String fileName -> mappingFileName }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -32,8 +47,8 @@ android {
             dimension 'style'
             applicationId "il.co.zak.gplv3.hamakor.teuria"
             testApplicationId "il.co.zak.gplv3.hamakor.teuria.test"
-            versionCode 11
-            versionName "0.3"
+            versionCode 12
+            versionName "0.4"
             minSdkVersion 8
             targetSdkVersion 16
         }
@@ -41,5 +56,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:23.0.0'
+    implementation 'com.android.support:support-v4:23.0.0'
 }
